@@ -39,8 +39,6 @@ def select_action(state):
 def optimize_model():
     if len(memory) < BATCH_SIZE:
         return
-    # sample transitions from memory replay
-    # list where each element is a named tuple
     transitions = memory.sample(BATCH_SIZE)
     """
     zip(*transitions) unzips the transitions into
@@ -82,7 +80,6 @@ def optimize_model():
     optimizer.step()
 
 def get_state(obs):
-    # state = np.ascontiguousarray(obs, dtype=float) / 255
     state = np.array(obs)
     state = state.transpose((2, 0, 1))
     state = torch.from_numpy(state)
@@ -94,13 +91,11 @@ def train(env, n_episodes, render=False):
         state = get_state(obs)
         total_reward = 0.0
         for t in count():
-            # select action
             action = select_action(state)
 
-            # render
-            if RENDER:
+            if render:
                 env.render()
-            # take step
+
             obs, reward, done, info = env.step(action)
 
             total_reward += reward
@@ -109,19 +104,15 @@ def train(env, n_episodes, render=False):
                 next_state = get_state(obs)
             else:
                 next_state = None
-            # convert reward to torch tensor
+
             reward = torch.tensor([reward], device=device)
 
-            # add transition to replay buffer
             memory.push(state, action.to('cpu'), next_state, reward.to('cpu'))
             state = next_state
 
-            
-            # optimize model
             if steps_done > INITIAL_MEMORY:
                 optimize_model()
 
-                # update target network
                 if steps_done % TARGET_UPDATE == 0:
                     target_net.load_state_dict(policy_net.state_dict())
 
@@ -139,14 +130,12 @@ def test(env, n_episodes, policy, render=True):
         state = get_state(obs)
         total_reward = 0.0
         for t in count():
-            # select action
             action = policy(state.to('cuda')).max(1)[1].view(1,1)
 
-            # render
             if render:
                 env.render()
                 time.sleep(0.02)
-            # take step
+
             obs, reward, done, info = env.step(action)
 
             total_reward += reward
@@ -171,12 +160,10 @@ if __name__ == '__main__':
 
     # hyperparameters
     BATCH_SIZE = 32
-    # BATCH_SIZE = 128
     GAMMA = 0.99
     EPS_START = 1
     EPS_END = 0.02
-    EPS_DECAY = 1
-    # EPS_DECAY = 1000000
+    EPS_DECAY = 1000000
     TARGET_UPDATE = 1000
     RENDER = False
     lr = 1e-4
@@ -195,16 +182,14 @@ if __name__ == '__main__':
 
     # create environment
     env = gym.make("PongNoFrameskip-v4")
-    # env = gym.make("BreakoutDeterministic-v4")
     env = make_env(env)
 
     # initialize replay memory
     memory = ReplayMemory(MEMORY_SIZE)
     
     # train model
-    # train(env, 400)
-    # train(env, 200000)
-    # torch.save(policy_net, "dqn_pong_model")
+    train(env, 400)
+    torch.save(policy_net, "dqn_pong_model")
     policy_net = torch.load("dqn_pong_model")
     test(env, 1, policy_net, render=False)
 
