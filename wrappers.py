@@ -11,23 +11,19 @@ import cv2
 cv2.ocl.setUseOpenCL(False)
 
 def make_env(env, stack_frames=True, episodic_life=True, clip_rewards=False, scale=False):
-    # if episodic_life:
-    #     env = EpisodicLifeEnv(env)
+    if episodic_life:
+        env = EpisodicLifeEnv(env)
 
-    #### Extras
     env = NoopResetEnv(env, noop_max=30)
     env = MaxAndSkipEnv(env, skip=4)
     if 'FIRE' in env.unwrapped.get_action_meanings():
         env = FireResetEnv(env)
-    ####
+
     env = WarpFrame(env)
-    # env = ProcessFrame84(env)
-    # env = ImageToPyTorch(env)
     if stack_frames:
         env = FrameStack(env, 4)
     if clip_rewards:
         env = ClipRewardEnv(env)
-        # env = ClippedRewardsWrapper(env)
     return env
 
 class RewardScaler(gym.RewardWrapper):
