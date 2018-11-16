@@ -1,5 +1,5 @@
 # DQN PyTorch
-This is a simple implementation of Deep Q-learning algorithm on the Atari Pong environment.
+This is a simple implementation of the Deep Q-learning algorithm on the Atari Pong environment.
 
 ![](/assets/pong.gif)
 
