@@ -1,7 +1,6 @@
 """
-Slighlty modified from OpenAI Baselines
+Adapted from OpenAI Baselines
 https://github.com/openai/baselines/blob/master/baselines/common/atari_wrappers.py
-Inspired by: https://github.com/hollygrimm/gymretro-rainbow/blob/master/sonic_util.py
 """
 from collections import deque
 import numpy as np
