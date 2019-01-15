@@ -7,7 +7,6 @@ import numpy as np
 import time
 
 import gym
-import retro
 
 from wrappers import *
 from memory import ReplayMemory
